@@ -1,11 +1,8 @@
 package com.example.demo.domain;
 
-import com.example.demo.AbstractIntegrationTest;
-import com.example.demo.domain.entities.*;
-import com.example.demo.domain.repositories.BookingItemRepository;
-import com.example.demo.domain.repositories.BookingRepository;
-import com.example.demo.domain.repositories.FlightRepository;
-import com.example.demo.domain.repositories.PassengerRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.example.demo.AbstractIntegrationTest;
+import com.example.demo.domain.entities.Booking;
+import com.example.demo.domain.entities.BookingItem;
+import com.example.demo.domain.entities.Passenger;
+import com.example.demo.domain.repositories.BookingItemRepository;
+import com.example.demo.domain.repositories.BookingRepository;
+import com.example.demo.domain.repositories.PassengerRepository;
 
 @DataJpaTest
 class BookingRepositoryTest extends AbstractIntegrationTest {
