@@ -1,32 +1,20 @@
 package com.example.demo.services.mappers;
 
-
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.example.demo.api.dto.BookingItemDtos;
-import com.example.demo.domain.entities.Booking;
 import com.example.demo.domain.entities.BookingItem;
-import com.example.demo.domain.entities.Flight;
 
-public class BookingItemMapper {
+@Mapper(componentModel = "spring")
+public interface BookingItemMapper {
 
-    public static BookingItem toEntity(BookingItemDtos.CreateBookingItemDTO req, Booking booking, Flight flight) {
-        return BookingItem.builder()
-                .booking(booking)
-                .flight(flight)
-                .build();
-    }
+    
+    @Mapping(target = "id", ignore = true)
+    BookingItem toEntity(BookingItemDtos.CreateBookingItemDTO dto);
 
-    public static BookingItemDtos.BookingItemResponseDTO toResponse(BookingItem bookingItem) {
-        return new BookingItemDtos.BookingItemResponseDTO(
-                bookingItem.getId(),
-                bookingItem.getBooking().getId(),
-                bookingItem.getFlight().getId()
-        );
-    }
+    BookingItemDtos.BookingItemResponseDTO toResponse(BookingItem BookingItem);
 
-    public static void patch(BookingItem bookingItem, BookingItemDtos.UpdateBookingItemDTO req, Booking booking, Flight flight) {
-        if (req.bookingId() != null && booking != null) bookingItem.setBooking(booking);
-        if (req.flightId() != null && flight != null) bookingItem.setFlight(flight);
-    }
+    void patch(@MappingTarget BookingItem BookingItem, BookingItemDtos.UpdateBookingItemDTO dto);
 }
-

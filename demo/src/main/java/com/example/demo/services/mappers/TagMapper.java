@@ -1,26 +1,20 @@
 package com.example.demo.services.mappers;
 
-
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.example.demo.api.dto.TagDtos;
 import com.example.demo.domain.entities.Tag;
 
-public class TagMapper {
+@Mapper(componentModel = "spring")
+public interface TagMapper {
 
-    public static Tag toEntity(TagDtos.CreateTagDTO req) {
-        return Tag.builder()
-                .name(req.name())
-                .build();
-    }
+    
+    @Mapping(target = "id", ignore = true)
+    Tag toEntity(TagDtos.CreateTagDTO dto);
 
-    public static TagDtos.TagResponseDTO toResponse(Tag tag) {
-        return new TagDtos.TagResponseDTO(
-                tag.getId(),
-                tag.getName()
-        );
-    }
+    TagDtos.TagResponseDTO toResponse(Tag Tag);
 
-    public static void patch(Tag tag, TagDtos.UpdateTagDTO req) {
-        if (req.name() != null) tag.setName(req.name());
-    }
+    void patch(@MappingTarget Tag Tag, TagDtos.UpdateTagDTO dto);
 }

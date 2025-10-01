@@ -1,18 +1,20 @@
 package com.example.demo.services.mappers;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import com.example.demo.api.dto.AirlineDtos;
 import com.example.demo.domain.entities.Airline;
 
-public class AirlineMapper {
+@Mapper(componentModel = "spring")
+public interface AirlineMapper {
 
-    public static Airline toEntity(AirlineDtos.AirlineCreateDto req){
-        return Airline.builder().name(req.name()).build();
+    
+    @Mapping(target = "id", ignore = true)
+    Airline toEntity(AirlineDtos.AirlineCreateDto dto);
 
-    }
+    AirlineDtos.AirlineResponse toResponse(Airline airline);
 
-    public static AirlineDtos.AirlineResponse toResponse(Airline airline){
-        return new AirlineDtos.AirlineResponse(airline.getId(), airline.getCode(), airline.getName());
-    }
-
-   
-}   
+    void patch(@MappingTarget Airline airline, AirlineDtos.AirlineUpdateDto dto);
+}

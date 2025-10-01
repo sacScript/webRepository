@@ -1,32 +1,20 @@
 package com.example.demo.services.mappers;
 
-
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.example.demo.api.dto.AirportDtos;
 import com.example.demo.domain.entities.Airport;
 
-public class AirportMapper {
+@Mapper(componentModel = "spring")
+public interface AirportMapper {
 
     
-    public static Airport toEntity(AirportDtos.CreateAirportDTO req) {
-        return Airport.builder()
-                .name(req.name())
-                .code(req.code())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    Airport toEntity(AirportDtos.CreateAirportDTO dto);
 
-    public static AirportDtos.AirportResponseDTO toResponse(Airport airport) {
-        return new AirportDtos.AirportResponseDTO(
-                airport.getId(),
-                airport.getName(),
-                airport.getCode()
-                
-        );
-    }
+    AirportDtos.AirportResponseDTO toResponse(Airport airport);
 
-   
-    public static void patch(Airport airport, AirportDtos.UpdateAirportDTO req) {
-        if (req.name() != null) airport.setName(req.name());
-        if (req.code() != null) airport.setCode(req.code());
-    }
+    void patch(@MappingTarget Airport airport, AirportDtos.UpdateAirportDTO dto);
 }
