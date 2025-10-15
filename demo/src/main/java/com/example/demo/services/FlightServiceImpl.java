@@ -27,6 +27,7 @@ public class FlightServiceImpl implements FlightService {
     private final FlightRepository flightRepository;
     private final AirportRepository airportRepository;
     private final AirlineRepository airlineRepository;
+    private final FlightMapper flightMapper;
 
     @Override
     public FlightResponseDTO create(CreateFlightDTO req) {
@@ -36,19 +37,22 @@ public class FlightServiceImpl implements FlightService {
         Airport destination = airportRepository.findByCode(req.destination())
                 .orElseThrow(() -> new EntityNotFoundException("Destination airport not found: " + req.destination()));
 
-        
         Airline airline = airlineRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("No airline found"));
 
-        Flight flight = FlightMapper.toEntity(req, origin, destination, airline);
-        return FlightMapper.toResponse(flightRepository.save(flight));
+        Flight flight = flightMapper.toEntity(req);
+        flight.setOrigin(origin);
+        flight.setDestination(destination);
+        flight.setAirline(airline);
+
+        return flightMapper.toResponse(flightRepository.save(flight));
     }
 
     @Override
     public FlightResponseDTO get(Long id) {
         Flight flight = flightRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Flight not found with id " + id));
-        return FlightMapper.toResponse(flight);
+        return flightMapper.toResponse(flight);
     }
 
     @Override
@@ -77,14 +81,18 @@ public class FlightServiceImpl implements FlightService {
                     .orElseThrow(() -> new EntityNotFoundException("Destination airport not found: " + req.destination()));
         }
 
-        FlightMapper.patch(flight, req, origin, destination);
-        return FlightMapper.toResponse(flightRepository.save(flight));
+        flightMapper.patch(flight, req);
+
+        if (origin != null) flight.setOrigin(origin);
+        if (destination != null) flight.setDestination(destination);
+
+        return flightMapper.toResponse(flightRepository.save(flight));
     }
 
     @Override
     public List<FlightResponseDTO> list() {
         return flightRepository.findAll().stream()
-                .map(FlightMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(flightMapper::toResponse)
+                .toList();
     }
 }

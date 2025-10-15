@@ -12,3 +12,5 @@ public class TagDtos {
     public record TagResponseDTO(Long id, String name) implements Serializable {
     }
 }
+ 
+

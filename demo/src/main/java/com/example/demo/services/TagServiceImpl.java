@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -14,25 +13,25 @@ import com.example.demo.services.mappers.TagMapper;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
     @Override
     public TagResponseDTO create(CreateTagDTO req) {
-        Tag tag = TagMapper.toEntity(req);
+        Tag tag = tagMapper.toEntity(req);
         Tag saved = tagRepository.save(tag);
-        return TagMapper.toResponse(saved);
+        return tagMapper.toResponse(saved);
     }
 
     @Override
     public TagResponseDTO get(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tag not found with id " + id));
-        return TagMapper.toResponse(tag);
+        return tagMapper.toResponse(tag);
     }
 
     @Override
@@ -48,16 +47,16 @@ public class TagServiceImpl implements TagService {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tag not found with id " + id));
 
-        TagMapper.patch(tag, req);
+        tagMapper.patch(tag, req);
         Tag updated = tagRepository.save(tag);
 
-        return TagMapper.toResponse(updated);
+        return tagMapper.toResponse(updated);
     }
 
     @Override
     public List<TagResponseDTO> list() {
         return tagRepository.findAll().stream()
-                .map(TagMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(tagMapper::toResponse)
+                .toList();
     }
 }

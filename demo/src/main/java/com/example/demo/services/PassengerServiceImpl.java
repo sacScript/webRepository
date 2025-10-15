@@ -16,30 +16,31 @@ import com.example.demo.services.mappers.PassengerMapper;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository passengerRepository;
     private final PassengerProfileRepository passengerProfileRepository;
+    private final PassengerMapper passengerMapper;
 
     @Override
     public PassengerResponseDTO create(CreatePassengerDTO req) {
         PassengerProfile profile = passengerProfileRepository.findById(req.passengerProfileId())
                 .orElseThrow(() -> new EntityNotFoundException("PassengerProfile not found with id " + req.passengerProfileId()));
 
-        Passenger passenger = PassengerMapper.toEntity(req, profile);
-        Passenger saved = passengerRepository.save(passenger);
+        Passenger passenger = passengerMapper.toEntity(req);
+        passenger = new Passenger(passenger.getId(), passenger.getName(), passenger.getEmail(), profile);
 
-        return PassengerMapper.toResponse(saved);
+        Passenger saved = passengerRepository.save(passenger);
+        return passengerMapper.toResponse(saved);
     }
 
     @Override
     public PassengerResponseDTO get(Long id) {
         Passenger passenger = passengerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Passenger not found with id " + id));
-        return PassengerMapper.toResponse(passenger);
+        return passengerMapper.toResponse(passenger);
     }
 
     @Override
@@ -61,16 +62,20 @@ public class PassengerServiceImpl implements PassengerService {
                     .orElseThrow(() -> new EntityNotFoundException("PassengerProfile not found with id " + req.passengerProfileId()));
         }
 
-        PassengerMapper.patch(passenger, req, profile);
-        Passenger updated = passengerRepository.save(passenger);
+        passengerMapper.patch(passenger, req);
 
-        return PassengerMapper.toResponse(updated);
+        if (profile != null) {
+            passenger = new Passenger(passenger.getId(), passenger.getName(), passenger.getEmail(), profile);
+        }
+
+        Passenger updated = passengerRepository.save(passenger);
+        return passengerMapper.toResponse(updated);
     }
 
     @Override
     public List<PassengerResponseDTO> list() {
         return passengerRepository.findAll().stream()
-                .map(PassengerMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(passengerMapper::toResponse)
+                .toList();
     }
 }

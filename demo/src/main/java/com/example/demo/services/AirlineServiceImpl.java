@@ -15,16 +15,17 @@ import com.example.demo.services.mappers.AirlineMapper;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class AirlineServiceImpl implements AirlineService {
 
     private final AirlineRepository repos;
+    private final AirlineMapper airlineMapper; 
 
     @Override
     public AirlineResponse create(AirlineCreateDto req) {
-        return AirlineMapper.toResponse(
-                repos.save(AirlineMapper.toEntity(req))
+        return airlineMapper.toResponse(
+                repos.save(airlineMapper.toEntity(req))
         );
     }
 
@@ -32,7 +33,7 @@ public class AirlineServiceImpl implements AirlineService {
     @Transactional(readOnly = true)
     public AirlineResponse get(Long id) {
         return repos.findById(id)
-                .map(AirlineMapper::toResponse)
+                .map(airlineMapper::toResponse)
                 .orElseThrow(() -> new NotFoundException("Airline %d not found".formatted(id)));
     }
 
@@ -41,24 +42,22 @@ public class AirlineServiceImpl implements AirlineService {
     public List<AirlineResponse> list() {
         return repos.findAll()
                 .stream()
-                .map(AirlineMapper::toResponse)
+                .map(airlineMapper::toResponse)
                 .toList();
     }
 
-   @Override
-public AirlineResponse update(Long id, AirlineDtos.AirlineUpdateDto req) {
-    var airline = repos.findById(id)
-            .orElseThrow(() -> new NotFoundException("Airline %d not found".formatted(id)));
+    @Override
+    public AirlineResponse update(Long id, AirlineDtos.AirlineUpdateDto req) {
+        var airline = repos.findById(id)
+                .orElseThrow(() -> new NotFoundException("Airline %d not found".formatted(id)));
 
-    airline.setName(req.name());
+        airline.setName(req.name());
 
-    return AirlineMapper.toResponse(airline);
-}
-
+        return airlineMapper.toResponse(airline);
+    }
 
     @Override
     public void delete(Long id) {
         repos.deleteById(id);
     }
 }
-

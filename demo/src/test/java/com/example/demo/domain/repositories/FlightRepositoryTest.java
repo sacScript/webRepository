@@ -1,26 +1,22 @@
-package com.example.demo.domain;
+package com.example.demo.domain.repositories;
 
-import com.example.demo.AbstractIntegrationTest;
-import com.example.demo.domain.entities.*;
-import com.example.demo.domain.repositories.AirlineRepository;
-import com.example.demo.domain.repositories.AirportRepository;
-import com.example.demo.domain.repositories.FlightRepository;
-import com.example.demo.domain.repositories.TagRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-@DataJpaTest
+import com.example.demo.domain.entities.Airline;
+import com.example.demo.domain.entities.Airport;
+import com.example.demo.domain.entities.Flight;
+import com.example.demo.domain.entities.Tag;
+
 class FlightRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired

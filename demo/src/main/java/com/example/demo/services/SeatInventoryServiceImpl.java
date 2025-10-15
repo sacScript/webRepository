@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,7 @@ import com.example.demo.domain.entities.Flight;
 import com.example.demo.domain.entities.SeatInventory;
 import com.example.demo.domain.repositories.FlightRepository;
 import com.example.demo.domain.repositories.SeatInventoryRepository;
-
+import com.example.demo.services.mappers.SeatInventoryMapper;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,23 +22,25 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
 
     private final SeatInventoryRepository seatInventoryRepository;
     private final FlightRepository flightRepository;
+    private final SeatInventoryMapper seatInventoryMapper;
 
     @Override
     public SeatInventoryResponseDTO create(CreateSeatInventoryDTO req) {
         Flight flight = flightRepository.findById(req.flightId())
                 .orElseThrow(() -> new EntityNotFoundException("Flight not found with id " + req.flightId()));
 
-        SeatInventory seatInventory = SeatInventoryMapper.toEntity(req, flight);
-        SeatInventory saved = seatInventoryRepository.save(seatInventory);
+        SeatInventory seatInventory = seatInventoryMapper.toEntity(req);
+        seatInventory.setFlight(flight);
 
-        return SeatInventoryMapper.toResponse(saved);
+        SeatInventory saved = seatInventoryRepository.save(seatInventory);
+        return seatInventoryMapper.toResponse(saved);
     }
 
     @Override
     public SeatInventoryResponseDTO get(Long id) {
         SeatInventory seatInventory = seatInventoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("SeatInventory not found with id " + id));
-        return SeatInventoryMapper.toResponse(seatInventory);
+        return seatInventoryMapper.toResponse(seatInventory);
     }
 
     @Override
@@ -61,16 +62,21 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
                     .orElseThrow(() -> new EntityNotFoundException("Flight not found with id " + req.flightId()));
         }
 
-        SeatInventoryMapper.patch(seatInventory, req, flight);
-        SeatInventory updated = seatInventoryRepository.save(seatInventory);
+        seatInventoryMapper.patch(seatInventory, req);
 
-        return SeatInventoryMapper.toResponse(updated);
+        if (flight != null) {
+            seatInventory.setFlight(flight);
+        }
+
+        SeatInventory updated = seatInventoryRepository.save(seatInventory);
+        return seatInventoryMapper.toResponse(updated);
     }
 
     @Override
     public List<SeatInventoryResponseDTO> list() {
         return seatInventoryRepository.findAll().stream()
-                .map(SeatInventoryMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(seatInventoryMapper::toResponse)
+                .toList();
     }
 }
+

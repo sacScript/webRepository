@@ -21,6 +21,7 @@ public class BookingItemServiceImpl implements BookingItemService {
     private final BookingItemRepository bookingItemRepo;
     private final BookingRepository bookingRepo;
     private final FlightRepository flightRepo;
+    private final BookingItemMapper bookingItemMapper; 
 
     @Override
     public BookingItemDtos.BookingItemResponseDTO create(BookingItemDtos.CreateBookingItemDTO req) {
@@ -29,15 +30,18 @@ public class BookingItemServiceImpl implements BookingItemService {
         var flight = flightRepo.findById(req.flightId())
                 .orElseThrow(() -> new NotFoundException("Flight %d not found".formatted(req.flightId())));
 
-        var entity = BookingItemMapper.toEntity(req, booking, flight);
-        return BookingItemMapper.toResponse(bookingItemRepo.save(entity));
+        var entity = bookingItemMapper.toEntity(req);
+        entity.setBooking(booking);
+        entity.setFlight(flight);
+
+        return bookingItemMapper.toResponse(bookingItemRepo.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BookingItemDtos.BookingItemResponseDTO get(Long id) {
         return bookingItemRepo.findById(id)
-                .map(BookingItemMapper::toResponse)
+                .map(bookingItemMapper::toResponse) 
                 .orElseThrow(() -> new NotFoundException("BookingItem %d not found".formatted(id)));
     }
 
@@ -46,7 +50,7 @@ public class BookingItemServiceImpl implements BookingItemService {
     public List<BookingItemDtos.BookingItemResponseDTO> list() {
         return bookingItemRepo.findAll()
                 .stream()
-                .map(BookingItemMapper::toResponse)
+                .map(bookingItemMapper::toResponse) 
                 .toList();
     }
 
@@ -55,18 +59,21 @@ public class BookingItemServiceImpl implements BookingItemService {
         var bookingItem = bookingItemRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("BookingItem %d not found".formatted(id)));
 
-        var booking = req.bookingId() != null
-                ? bookingRepo.findById(req.bookingId())
-                    .orElseThrow(() -> new NotFoundException("Booking %d not found".formatted(req.bookingId())))
-                : null;
+        if (req.bookingId() != null) {
+            var booking = bookingRepo.findById(req.bookingId())
+                    .orElseThrow(() -> new NotFoundException("Booking %d not found".formatted(req.bookingId())));
+            bookingItem.setBooking(booking);
+        }
 
-        var flight = req.flightId() != null
-                ? flightRepo.findById(req.flightId())
-                    .orElseThrow(() -> new NotFoundException("Flight %d not found".formatted(req.flightId())))
-                : null;
+        if (req.flightId() != null) {
+            var flight = flightRepo.findById(req.flightId())
+                    .orElseThrow(() -> new NotFoundException("Flight %d not found".formatted(req.flightId())));
+            bookingItem.setFlight(flight);
+        }
 
-        BookingItemMapper.patch(bookingItem, req, booking, flight);
-        return BookingItemMapper.toResponse(bookingItemRepo.save(bookingItem));
+        bookingItemMapper.patch(bookingItem, req); 
+
+        return bookingItemMapper.toResponse(bookingItemRepo.save(bookingItem));
     }
 
     @Override

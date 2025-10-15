@@ -24,25 +24,33 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepo;
     private final PassengerRepository passengerRepo;
     private final FlightRepository flightRepo;
+    private final BookingMapper bookingMapper; 
 
     @Override
     public BookingDtos.BookingResponseDTO create(BookingDtos.CreateBookingDTO req) {
         Passenger passenger = passengerRepo.findById(req.passengerId())
-                .orElseThrow(() -> new NotFoundException("Passenger %d not found".formatted(req.passengerId())));
+                .orElseThrow(() -> new NotFoundException(
+                        "Passenger %d not found".formatted(req.passengerId())));
 
         Flight flight = flightRepo.findById(req.flightId())
-                .orElseThrow(() -> new NotFoundException("Flight %d not found".formatted(req.flightId())));
+                .orElseThrow(() -> new NotFoundException(
+                        "Flight %d not found".formatted(req.flightId())));
 
-        Booking booking = BookingMapper.toEntity(req, passenger, flight);
-        return BookingMapper.toResponse(bookingRepo.save(booking));
+        Booking booking = bookingMapper.toEntity(req);
+
+        booking.setPassenger(passenger);
+        booking.setFlight(flight);
+
+        return bookingMapper.toResponse(bookingRepo.save(booking));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BookingDtos.BookingResponseDTO get(Long id) {
         return bookingRepo.findById(id)
-                .map(BookingMapper::toResponse)
-                .orElseThrow(() -> new NotFoundException("Booking %d not found".formatted(id)));
+                .map(bookingMapper::toResponse)
+                .orElseThrow(() -> new NotFoundException(
+                        "Booking %d not found".formatted(id)));
     }
 
     @Override
@@ -50,27 +58,34 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtos.BookingResponseDTO> list() {
         return bookingRepo.findAll()
                 .stream()
-                .map(BookingMapper::toResponse)
+                .map(bookingMapper::toResponse)
                 .toList();
     }
 
     @Override
     public BookingDtos.BookingResponseDTO update(Long id, BookingDtos.UpdateBookingDTO req) {
         Booking booking = bookingRepo.findById(id)
-                .orElseThrow(() -> new NotFoundException("Booking %d not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException(
+                        "Booking %d not found".formatted(id)));
 
         Passenger passenger = req.passengerId() != null
                 ? passengerRepo.findById(req.passengerId())
-                .orElseThrow(() -> new NotFoundException("Passenger %d not found".formatted(req.passengerId())))
+                    .orElseThrow(() -> new NotFoundException(
+                            "Passenger %d not found".formatted(req.passengerId())))
                 : null;
 
         Flight flight = req.flightId() != null
                 ? flightRepo.findById(req.flightId())
-                .orElseThrow(() -> new NotFoundException("Flight %d not found".formatted(req.flightId())))
+                    .orElseThrow(() -> new NotFoundException(
+                            "Flight %d not found".formatted(req.flightId())))
                 : null;
 
-        BookingMapper.patch(booking, req, passenger, flight);
-        return BookingMapper.toResponse(bookingRepo.save(booking));
+        bookingMapper.patch(booking, req);
+
+        if (passenger != null) booking.setPassenger(passenger);
+        if (flight != null) booking.setFlight(flight);
+
+        return bookingMapper.toResponse(bookingRepo.save(booking));
     }
 
     @Override

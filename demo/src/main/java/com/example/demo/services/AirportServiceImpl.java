@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +9,7 @@ import com.example.demo.domain.repositories.AirportRepository;
 import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.services.mappers.AirportMapper;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,18 +17,19 @@ import lombok.RequiredArgsConstructor;
 public class AirportServiceImpl implements AirportService {
 
     private final AirportRepository repo;
+    private final AirportMapper airportMapper;
 
     @Override
     public AirportDtos.AirportResponseDTO create(AirportDtos.CreateAirportDTO req) {
-        var airport = AirportMapper.toEntity(req);
-        return AirportMapper.toResponse(repo.save(airport));
+        var airport = airportMapper.toEntity(req);
+        return airportMapper.toResponse(repo.save(airport));
     }
 
     @Override
     @Transactional(readOnly = true)
     public AirportDtos.AirportResponseDTO get(Long id) {
         return repo.findById(id)
-                .map(AirportMapper::toResponse)
+                .map(airportMapper::toResponse)
                 .orElseThrow(() -> new NotFoundException("Airport %d not found".formatted(id)));
     }
 
@@ -37,7 +37,7 @@ public class AirportServiceImpl implements AirportService {
     @Transactional(readOnly = true)
     public List<AirportDtos.AirportResponseDTO> list() {
         return repo.findAll().stream()
-                .map(AirportMapper::toResponse)
+                .map(airportMapper::toResponse)
                 .toList();
     }
 
@@ -45,8 +45,10 @@ public class AirportServiceImpl implements AirportService {
     public AirportDtos.AirportResponseDTO update(Long id, AirportDtos.UpdateAirportDTO req) {
         var airport = repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Airport %d not found".formatted(id)));
-        AirportMapper.patch(airport, req);
-        return AirportMapper.toResponse(repo.save(airport));
+
+        airportMapper.patch(airport, req);
+
+        return airportMapper.toResponse(repo.save(airport));
     }
 
     @Override
@@ -57,4 +59,3 @@ public class AirportServiceImpl implements AirportService {
         repo.deleteById(id);
     }
 }
-

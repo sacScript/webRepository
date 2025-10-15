@@ -14,6 +14,6 @@ public class SeatInventoryDtos {
     }
 
     public record SeatInventoryResponseDTO(Long id, Cabin cabin, Integer totalSeats, Integer availableSeats,
-            Long flightId) implements Serializable {
+            Long flightId, Long flightNumber) implements Serializable {
     }
 }
