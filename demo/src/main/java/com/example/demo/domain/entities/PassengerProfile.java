@@ -20,7 +20,4 @@ public class PassengerProfile {
 
     @Column(nullable = false)
     private String countryCode;
-
-    @OneToOne(mappedBy = "profile")
-    private Passenger passenger;
 }

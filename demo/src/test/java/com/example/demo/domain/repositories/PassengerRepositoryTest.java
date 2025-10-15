@@ -1,21 +1,17 @@
-package com.example.demo.domain;
+package com.example.demo.domain.repositories;
 
-import com.example.demo.AbstractIntegrationTest;
-import com.example.demo.domain.entities.Passenger;
-import com.example.demo.domain.entities.PassengerProfile;
-import com.example.demo.domain.repositories.PassengerRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import java.util.Optional;
+import com.example.demo.domain.entities.Passenger;
+import com.example.demo.domain.entities.PassengerProfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@DataJpaTest
 class PassengerRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -23,12 +19,16 @@ class PassengerRepositoryTest extends AbstractIntegrationTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    private Passenger passenger;
-
     @BeforeEach
     void setUp() {
-        passenger = new Passenger(null, "Test User", "test.user@example.com", null, null);
-        PassengerProfile profile = new PassengerProfile(null, "12345678A", "Calle Test", passenger);
+        var passenger = Passenger.builder()
+                .fullName("Test User")
+                .email("test.user@example.com")
+                .build();
+        PassengerProfile profile = PassengerProfile.builder()
+                .phone("123-456-7890")
+                .countryCode("US")
+                .build();
         passenger.setProfile(profile);
         passengerRepository.save(passenger);
 
@@ -40,7 +40,8 @@ class PassengerRepositoryTest extends AbstractIntegrationTest {
     @Test
     void testFindByEmailIgnoreCaseWithProfile() {
         // Act
-        Optional<Passenger> foundPassenger = passengerRepository.findByEmailIgnoreCaseWithProfile("TEST.USER@example.com");
+        Optional<Passenger> foundPassenger = passengerRepository
+                .findByEmailIgnoreCaseWithProfile("TEST.USER@example.com");
 
         // Assert
         assertThat(foundPassenger).isPresent();
