@@ -1,14 +1,18 @@
 package com.example.demo.services;
 
-import java.util.List;
 
-import com.example.demo.api.dto.BookingDtos;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.example.demo.api.dto.BookingDtos.BookingResponseDTO;
+import com.example.demo.api.dto.BookingDtos.CreateBookingDTO;
+import com.example.demo.api.dto.BookingDtos.UpdateBookingDTO;
 
 
 public interface BookingService {
-    BookingDtos.BookingResponseDTO create(BookingDtos.CreateBookingDTO req);
-    BookingDtos.BookingResponseDTO get(Long id);
-    BookingDtos.BookingResponseDTO update(Long id, BookingDtos.UpdateBookingDTO req);
+    BookingResponseDTO create(Long passengerId, CreateBookingDTO req);
+    BookingResponseDTO get(Long id);
+    BookingResponseDTO update(Long id,UpdateBookingDTO req);
     void delete(Long id);
-    List<BookingDtos.BookingResponseDTO> list();
+    Page<BookingResponseDTO> listByPassenger( String email,Pageable pageable);
 }

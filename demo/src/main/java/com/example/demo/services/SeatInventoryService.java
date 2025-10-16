@@ -9,9 +9,9 @@ import com.example.demo.api.dto.SeatInventoryDtos.UpdateSeatInventoryDTO;
 
 public interface SeatInventoryService {
 
-    SeatInventoryResponseDTO create(CreateSeatInventoryDTO req);
+    SeatInventoryResponseDTO create(Long flightId, CreateSeatInventoryDTO req);
     SeatInventoryResponseDTO get(Long id);
     void delete(Long id);
     SeatInventoryResponseDTO update(Long id, UpdateSeatInventoryDTO req);
-    List<SeatInventoryResponseDTO> list();
+    List<SeatInventoryResponseDTO> listByFlight(Long flightId);
 }

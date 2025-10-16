@@ -8,11 +8,8 @@ import com.example.demo.api.dto.BookingDtos.BookingItemResponseDTO;
 
 
 public interface BookingItemService {
-    BookingItemResponseDTO add(Long bookingId,BookingItemCreateDTO req);
+    BookingItemResponseDTO addItem(Long bookingId,BookingItemCreateDTO req);
     BookingItemResponseDTO get(Long id);
-    void delete(Long id);
-    List<BookingItemResponseDTO> list();
-    
-
-    
+    void removeItem(Long itemId);
+    List<BookingItemResponseDTO> listByBooking(Long bookingId);
 }
