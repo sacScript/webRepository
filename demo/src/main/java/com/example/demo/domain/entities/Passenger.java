@@ -2,7 +2,6 @@ package com.example.demo.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.*;
 
 @Entity
 @Table(name = "passengers")
@@ -25,9 +24,5 @@ public class Passenger {
     @OneToOne(optional = false)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private PassengerProfile profile;
-
-    @OneToMany(mappedBy = "passenger")
-    @Builder.Default
-    private Set<Booking> bookings = new HashSet<>();
 
 }

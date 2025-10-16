@@ -1,21 +1,16 @@
-package com.example.demo.domain;
-
-import com.example.demo.AbstractIntegrationTest;
-import com.example.demo.domain.entities.Flight;
-import com.example.demo.domain.entities.SeatInventory;
-import com.example.demo.domain.enums.Cabin;
-import com.example.demo.domain.repositories.FlightRepository;
-import com.example.demo.domain.repositories.SeatInventoryRepository;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.time.OffsetDateTime;
+package com.example.demo.domain.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+import java.time.OffsetDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.example.demo.domain.entities.Flight;
+import com.example.demo.domain.entities.SeatInventory;
+import com.example.demo.domain.enums.Cabin;
+
 class SeatInventoryRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired

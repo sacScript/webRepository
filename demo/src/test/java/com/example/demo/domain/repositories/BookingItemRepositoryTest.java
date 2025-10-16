@@ -1,4 +1,4 @@
-package com.example.demo.domain;
+package com.example.demo.domain.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.example.demo.AbstractIntegrationTest;
 import com.example.demo.domain.entities.Booking;
 import com.example.demo.domain.entities.BookingItem;
 import com.example.demo.domain.entities.Passenger;
@@ -31,11 +30,11 @@ class BookingItemRepositoryTest extends AbstractIntegrationTest {
     @Test
     void testCalculateTotalByBookingId() {
         // Arrange
-        Passenger passenger = passengerRepository.save(new Passenger(null, "Test", "test@example.com", null, null));
-        Booking booking = bookingRepository.save(new Booking(null, null, passenger, null));
+        Passenger passenger = passengerRepository.save(Passenger.builder().fullName("Test").email("test@example.com").build());
+        Booking booking = bookingRepository.save(Booking.builder().passenger(passenger).build());
 
-        BookingItem item1 = new BookingItem();
-        BookingItem item2 = new BookingItem();
+        BookingItem item1 = BookingItem.builder().booking(booking).price(new BigDecimal("100.00")).build();
+        BookingItem item2 = BookingItem.builder().booking(booking).price(new BigDecimal("251.00")).build();
         bookingItemRepository.saveAll(List.of(item1, item2));
 
         // Act
